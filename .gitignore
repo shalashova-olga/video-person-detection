@@ -22,15 +22,6 @@ dist/
 pytest_cache/
 runs/
 
-# Videos and generated outputs
-out/
-*.mp4
-*.avi
-*.mov
-*.mkv
-!crowd.mp4  # оставляем пример входного видео
-!crowd_annotated.mp4
-!crowd_pose_validated.mp4
 
 # Weights / checkpoints
 *.pt
