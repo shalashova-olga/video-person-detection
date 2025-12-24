@@ -1,0 +1,50 @@
+from datetime import datetime
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+
+# Путь к твоему проекту на диске
+PROJECT_DIR = "/Users/olgashalashova/github_issues_project"
+
+default_args = {
+    "owner": "airflow",
+    "depends_on_past": False,
+    "retries": 0,
+}
+
+with DAG(
+    dag_id="nyc_taxi_etl",
+    default_args=default_args,
+    start_date=datetime(2024, 1, 1),
+    schedule_interval=None,   # запускать вручную (для проекта удобно)
+    catchup=False,
+    tags=["nyc_taxi", "bigdata"],
+) as dag:
+
+    # 1. Extract – для проекта можем сделать заглушку
+    extract_raw = BashOperator(
+        task_id="extract_raw",
+        bash_command='echo "Extract step (raw data already downloaded)"'
+    )
+
+    # 2. Transform – твой Spark-скрипт, который делает nyc_taxi_2024_feat.parquet
+    transform_features = BashOperator(
+        task_id="transform_features",
+        bash_command=(
+            "cd {project} && "
+            "spark-submit spark_jobs/transform_features.py"
+        ).format(project=PROJECT_DIR),
+    )
+
+    # 3. Load – твой Spark-скрипт, который строит витрину и пишет в PostgreSQL
+    build_fact_trips_agg = BashOperator(
+        task_id="build_fact_trips_agg",
+        bash_command=(
+            "cd {project} && "
+            "spark-submit "
+            "--packages org.postgresql:postgresql:42.5.0 "
+            "spark_jobs/build_fact_trips_agg.py"
+        ).format(project=PROJECT_DIR),
+    )
+
+    extract_raw >> transform_features >> build_fact_trips_agg
+

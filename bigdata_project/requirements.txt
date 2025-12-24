@@ -1,0 +1,21 @@
+# Основное
+pyspark==4.0.1
+pandas==2.1.1
+numpy==1.26.0
+pyarrow==21.0.0
+psycopg2-binary==2.9.11
+catboost==1.2.8
+shap==0.48.0
+
+# Airflow
+apache-airflow==2.10.3
+apache-airflow-providers-postgres==6.1.3
+apache-airflow-providers-http==4.12.0
+apache-airflow-providers-ftp==3.10.0
+apache-airflow-providers-sqlite==3.8.1
+
+# Для ETL и визуализации
+matplotlib==3.10.3
+seaborn==0.13.2
+plotly==6.3.0
+streamlit==1.30

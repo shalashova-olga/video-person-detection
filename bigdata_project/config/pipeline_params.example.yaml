@@ -1,0 +1,43 @@
+# Copy this file to config/pipeline_params.yaml and adjust values locally.
+# Используется как единая точка параметров пайплайна (скачивание, Spark, БД, ML).
+
+download:
+  # Сколько последних месяцев TLC yellow скачивать
+  months_back: 6
+  base_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"
+  out_dir: "data/raw/tlc_yellow"
+  reference_dir: "data/reference"
+
+spark:
+  master: "local[*]"
+  driver_memory: "8g"
+  executor_memory: "4g"
+  # Для отладки можно брать часть данных (<1.0). Для полного прогона оставить 1.0.
+  sample_fraction: 1.0
+
+postgres:
+  host: "localhost"
+  port: 5435        # docker-compose пробрасывает 5435 -> 5432 контейнера
+  db: "nyc_taxi"
+  user: "postgres"
+  password: "1234"
+
+tables:
+  fact_trips_agg: "fact_trips_agg"
+  ml_trips_hourly: "ml_trips_hourly"
+  predictions: "pred_trips_hourly"
+
+paths:
+  features_parquet: "data/processed/nyc_taxi_features.parquet"
+  reference_lookup: "data/reference/taxi_zone_lookup.csv"
+  models_dir: "models"
+  catboost_model: "models/catboost_trips_hourly_optuna.cbm"
+
+ml:
+  # Примерный горизонт/окно для обучения и валидации (если понадобятся)
+  train_days: 90
+  validation_days: 14
+
+dashboards:
+  host: "0.0.0.0"
+  port: 8501

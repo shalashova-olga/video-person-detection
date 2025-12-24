@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: nyc_taxi_postgres
+    environment:
+      POSTGRES_DB: nyc_taxi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  airflow:
+    build: .
+    container_name: nyc_taxi_airflow
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW_HOME: /usr/local/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:1234@postgres:5432/nyc_taxi
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_FOLDER: /usr/local/airflow/bigdata_project/dags
+      AIRFLOW__WEBSERVER__RBAC: "True"
+      AIRFLOW_ADMIN_USER: admin
+      AIRFLOW_ADMIN_PASSWORD: admin123
+      AIRFLOW_ADMIN_EMAIL: admin@example.com
+    volumes:
+      - .:/usr/local/airflow/bigdata_project
+    ports:
+      - "8080:8080"
+    command: ["airflow", "standalone"]
+    restart: unless-stopped
+
+  streamlit:
+    build: .
+    container_name: nyc_taxi_streamlit
+    depends_on:
+      - postgres
+    environment:
+      PG_USER: postgres
+      PG_PASSWORD: 1234
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: nyc_taxi
+    volumes:
+      - .:/usr/local/airflow/bigdata_project
+    working_dir: /usr/local/airflow/bigdata_project
+    command: >
+      streamlit run dashboards/app_forecast_trips.py 
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

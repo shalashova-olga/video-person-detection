@@ -1,0 +1,35 @@
+# Environments
+venv/
+.venv/
+env/
+.airflow_local/
+airflow.cfg
+airflow.db
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Airflow / logs
+logs/
+*.log
+
+# Data and artifacts (не коммитим сырые/промежуточные файлы)
+data/
+catboost_info/
+models/
+notebooks/.ipynb_checkpoints/
+spark-warehouse/
+metastore_db/
+
+# Local configs / secrets
+config/pipeline_params.yaml
